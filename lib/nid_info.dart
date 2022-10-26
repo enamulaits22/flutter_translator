@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:translator_app/config/route.dart';
 import 'package:translator_app/widgets/image_picker_tile.dart';
 
 class NidInfo extends StatefulWidget {
@@ -58,18 +59,24 @@ class _NidInfoState extends State<NidInfo> {
     log(ocrText);
     setState(() {
       name = getText('name@', '@');
-      nidNo = getText('nid no@', '@');
-      dateOfBirth = getText('@date of birth', '@').trimLeft();
+      nidNo = getText('nid no@', '@', false);
+      dateOfBirth = getText('@date of birth', '@', false).trimLeft();
     });
   }
 
-  String getText(String start, String end) {
-    String textFromOcr = 'not found! Invalid NID!!!';
+  String getText(String start, String end, [bool showSnackbar = true]) {
+    String textFromOcr = 'not found!';
     String str = ocrText.toLowerCase();
     final startIndex = str.indexOf(start);
     if (startIndex != -1) {
       final endIndex = str.indexOf(end, startIndex + start.length);
       textFromOcr = str.substring(startIndex + start.length, endIndex);
+    } else if(showSnackbar) {
+      RouteController.instance.showSnackBar(
+        message: 'Not found! Invalid NID!!!',
+        backgroundColor: Colors.red,
+        milliseconds: 1500,
+      );
     }
     return textFromOcr.toUpperCase();
   }
